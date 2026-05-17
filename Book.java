@@ -18,7 +18,6 @@ public class Book {
         this.title=title;
         this.authorName=authorName;
         this.left=null;
-        this.right=null;
-        
+        this.right=null; 
     }
 }
