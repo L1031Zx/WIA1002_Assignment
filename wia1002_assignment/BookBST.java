@@ -1,137 +1,157 @@
 package wia1002_assignment;
 
 public class BookBST {
-    private Book root;
-    private boolean matchFound;
+    private Book rootNode; // The top starting point of the tree
+    private boolean matchFound; // Flag to track if search text matches any books
 
     public BookBST() {
-        this.root = null;
+        this.rootNode = null;
     }
 
-    // Public method to start adding a book
+    // Starts the book cataloging process
     public void insert(int isbn, String title, String authorName) {
-        root = insertRecursive(root, isbn, title, authorName);
+        rootNode = insertRecursive(rootNode, isbn, title, authorName);
     }
 
-    private Book insertRecursive(Book current, int isbn, String title, String authorName) {
-        // 1. If the spot is empty, create the new book record
-        if (current == null) {
+    // Recursively finds the correct spot and adds the book
+    private Book insertRecursive(Book currentNode, int isbn, String title, String authorName) {
+        // If spot is empty, create the new book card
+        if (currentNode == null) {
             return new Book(isbn, title, authorName);
         }
 
-        if (isbn < current.getIsbn()) {
-            current.left = insertRecursive(current.left, isbn, title, authorName);
-        } else if (isbn > current.getIsbn()) {
-            current.right = insertRecursive(current.right, isbn, title, authorName);
+        // Navigate left for smaller ISBN, right for larger ISBN
+        if (isbn < currentNode.getIsbn()) {
+            currentNode.left = insertRecursive(currentNode.left, isbn, title, authorName);
+        } else if (isbn > currentNode.getIsbn()) {
+            currentNode.right = insertRecursive(currentNode.right, isbn, title, authorName);
         } else {
-            // If the title is the same, just increase the copy stock count
-            if (current.getTitle().equalsIgnoreCase(title)) {
-                current.setAvailableCopies(current.getAvailableCopies() + 1);
+            // Same ISBN and same title: increase available stock
+            if (currentNode.getTitle().equalsIgnoreCase(title)) {
+                currentNode.setAvailableCopies(currentNode.getAvailableCopies() + 1);
             }
-            // If the title is completely different, we do nothing to protect the data
         }
-        return current;
+        return currentNode;
     }
 
-    // Searches the library shelf using a specific ISBN number
+    // Public method to look up a book using its ISBN
     public Book searchByISBN(int isbn) {
-        return searchIsbnRecursive(root, isbn);
+        return searchIsbnRecursive(rootNode, isbn);
     }
 
-    private Book searchIsbnRecursive(Book current, int isbn) {
-        if (current == null || current.getIsbn() == isbn) {
-            return current;
+    // Recursively searches the tree splits by comparing ISBN sizes
+    private Book searchIsbnRecursive(Book currentNode, int isbn) {
+        if (currentNode == null || currentNode.getIsbn() == isbn) {
+            return currentNode;
         }
-        if (isbn < current.getIsbn()) {
-            return searchIsbnRecursive(current.left, isbn);
+        if (isbn < currentNode.getIsbn()) {
+            return searchIsbnRecursive(currentNode.left, isbn);
         }
-        return searchIsbnRecursive(current.right, isbn);
+        return searchIsbnRecursive(currentNode.right, isbn);
     }
 
-    // Lowers the copy count when a book is borrowed. Removes it from sight if copies hit 0
+    // Lowers stock count by 1; erases node if stock hits 0
     public void removeCopy(int isbn) {
-        Book b = searchByISBN(isbn);
-        if (b != null) {
-            b.setAvailableCopies(b.getAvailableCopies() - 1);
-            if (b.getAvailableCopies() <= 0) {
-                root = deleteNodeRecursive(root, isbn);
+        Book targetBook = searchByISBN(isbn);
+        if (targetBook != null) {
+            targetBook.setAvailableCopies(targetBook.getAvailableCopies() - 1);
+            if (targetBook.getAvailableCopies() <= 0) {
+                rootNode = deleteNodeRecursive(rootNode, isbn);
             }
         }
     }
 
-    private Book deleteNodeRecursive(Book current, int isbn) {
-        if (current == null) return null;
+    // Completely deletes a book node regardless of stock levels
+    public void deletePermanently(int isbn) {
+        rootNode = deleteNodeRecursive(rootNode, isbn);
+    }
 
-        if (isbn < current.getIsbn()) {
-            current.left = deleteNodeRecursive(current.left, isbn);
-        } else if (isbn > current.getIsbn()) {
-            current.right = deleteNodeRecursive(current.right, isbn);
+    // Standard recursive tree deletion algorithm to rearrange branches
+    private Book deleteNodeRecursive(Book currentNode, int isbn) {
+        if (currentNode == null) return null;
+
+        // Navigate down branches to find the book
+        if (isbn < currentNode.getIsbn()) {
+            currentNode.left = deleteNodeRecursive(currentNode.left, isbn);
+        } else if (isbn > currentNode.getIsbn()) {
+            currentNode.right = deleteNodeRecursive(currentNode.right, isbn);
         } else {
-            if (current.left == null) return current.right;
-            if (current.right == null) return current.left;
+            // Target found! Handle branch rewiring:
+            
+            // Case 1 & 2: Node has 0 or 1 child branch
+            if (currentNode.left == null) return currentNode.right;
+            if (currentNode.right == null) return currentNode.left;
 
-            current = findMinValue(current.right);
-            current.right = deleteNodeRecursive(current.right, current.getIsbn());
+            // Case 3: Node has 2 child branches. Replace with smallest node from right side
+            currentNode = findMinValue(currentNode.right);
+            
+            // Delete the duplicate replacement node from its old location
+            currentNode.right = deleteNodeRecursive(currentNode.right, currentNode.getIsbn());
         }
-        return current;
+        return currentNode;
     }
 
-    private Book findMinValue(Book root) {
-        Book minVal = root;
-        while (root.left != null) {
-            minVal = root.left;
-            root = root.left;
+    // Finds the lowest numeric value in a given sub-tree layout
+    private Book findMinValue(Book subTreeRoot) {
+        Book lowestValuedNode = subTreeRoot;
+        while (subTreeRoot.left != null) {
+            lowestValuedNode = subTreeRoot.left;
+            subTreeRoot = subTreeRoot.left;
         }
-        return minVal;
+        return lowestValuedNode;
     }
 
+    // Public method to print the entire catalog sorted by ISBN
     public void printInOrder() {
-        if (root == null) {
+        if (rootNode == null) {
             System.out.println("[!] The library catalog is currently empty.");
             return;
         }
-        printInOrderRecursive(root);
+        printInOrderRecursive(rootNode);
     }
 
-    private void printInOrderRecursive(Book current) {
-        if (current != null) {
-            printInOrderRecursive(current.left);
-            System.out.println(" -> " + current);
-            printInOrderRecursive(current.right);
+    // In-order traversal: Prints Left branch, then active Root, then Right branch
+    private void printInOrderRecursive(Book currentNode) {
+        if (currentNode != null) {
+            printInOrderRecursive(currentNode.left);
+            System.out.println(" -> " + currentNode);
+            printInOrderRecursive(currentNode.right);
         }
     }
 
+    // Traverses the tree to find keyword matches anywhere in book titles
     public void searchByTitle(String title) {
         matchFound = false;
-        searchTitleRecursive(root, title.toLowerCase());
+        searchTitleRecursive(rootNode, title.toLowerCase());
         if (!matchFound) System.out.println("[RESULT] No books found matching that title keyword.");
     }
 
-    private void searchTitleRecursive(Book current, String target) {
-        if (current != null) {
-            searchTitleRecursive(current.left, target);
-            if (current.getTitle().toLowerCase().contains(target)) {
-                System.out.println(" -> " + current);
+    private void searchTitleRecursive(Book currentNode, String targetKeyword) {
+        if (currentNode != null) {
+            searchTitleRecursive(currentNode.left, targetKeyword);
+            if (currentNode.getTitle().toLowerCase().contains(targetKeyword)) {
+                System.out.println(" -> " + currentNode);
                 matchFound = true;
             }
-            searchTitleRecursive(current.right, target);
+            searchTitleRecursive(currentNode.right, targetKeyword);
         }
     }
 
+    // Traverses the tree to find keyword matches anywhere in author names
     public void searchByAuthorName(String author) {
         matchFound = false;
-        searchAuthorRecursive(root, author.toLowerCase());
+        searchAuthorRecursive(rootNode, author.toLowerCase());
         if (!matchFound) System.out.println("[RESULT] No books found matching that author's name.");
     }
 
-    private void searchAuthorRecursive(Book current, String target) {
-        if (current != null) {
-            searchAuthorRecursive(current.left, target);
-            if (current.getAuthorName().toLowerCase().contains(target)) {
-                System.out.println(" -> " + current);
+    private void searchAuthorRecursive(Book currentNode, String targetKeyword) {
+        if (currentNode != null) {
+            searchAuthorRecursive(currentNode.left, targetKeyword);
+            if (currentNode.getAuthorName().toLowerCase().contains(targetKeyword)) {
+                System.out.println(" -> " + currentNode);
                 matchFound = true;
             }
-            searchAuthorRecursive(current.right, target);
+            searchAuthorRecursive(currentNode.right, targetKeyword);
         }
     }
 }

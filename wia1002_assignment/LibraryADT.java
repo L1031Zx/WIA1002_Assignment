@@ -9,8 +9,9 @@ public interface LibraryADT {
     void borrowBook(int isbn);
     void viewLatestHistory();
     void returnBook(int isbn);
-    void checkAndPayFines();
     void displayEntireCatalogue();
     void updateBookStock(int isbn, int newCopyCount);
     void editBookDetails(int isbn, String newTitle, String newAuthor);
+    void preloadBook(int isbn, String title, String authorName);
+    void checkAndPayFines(boolean payNow);
 }

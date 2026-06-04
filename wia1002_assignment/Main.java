@@ -1,17 +1,17 @@
 package wia1002_assignment;
 
-import  java.util.Scanner;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         LibraryADT library = new SmartLibrary();
         Scanner inputScanner = new Scanner(System.in);
 
-        // Preload baseline data using clean void calls
-        library.addBook(1001, "The Great Gatsby", "F. Scott Fitzgerald");
-        library.addBook(1005, "To Kill a Mockingbird", "Harper Lee");
-        library.addBook(1003, "1984", "George Orwell");
-        library.addBook(1002, "Animal Farm", "George Orwell");
+        // Preload baseline sample data
+        library.preloadBook(1001, "The Great Gatsby", "F. Scott Fitzgerald");
+        library.preloadBook(1005, "To Kill a Mockingbird", "Harper Lee");
+        library.preloadBook(1003, "1984", "George Orwell");
+        library.preloadBook(1002, "Animal Farm", "George Orwell");
 
         System.out.println("====================================================");
         System.out.println("       WELCOME TO THE SMART UNIVERSITY LIBRARY      ");
@@ -24,16 +24,17 @@ public class Main {
             System.out.println("3. Turn Off System");
             System.out.print("Please enter your choice (1-3): ");
 
-            String roleInput = inputScanner.nextLine().trim();
-            int roleChoice;
+            String userRoleInput = inputScanner.nextLine().trim();
+            int portalSelection;
             try {
-                roleChoice = Integer.parseInt(roleInput);
+                portalSelection = Integer.parseInt(userRoleInput);
             } catch (NumberFormatException e) {
                 System.out.println("\n[ERROR] Invalid choice! Please type a valid option number (1, 2, or 3).");
                 continue;
             }
 
-            if (roleChoice == 3) {
+            // Exits and turns off the application
+            if (portalSelection == 3) {
                 System.out.println("\nShutting down library application. Goodbye!");
                 inputScanner.close();
                 System.exit(0);
@@ -42,22 +43,22 @@ public class Main {
             // ==========================================
             // LIBRARIAN INTERFACE
             // ==========================================
-            if (roleChoice == 1) {
+            if (portalSelection == 1) {
                 boolean insideLibrarian = true;
                 while (insideLibrarian) {
                     System.out.println("\n--- LIBRARIAN INTERFACE ---");
                     System.out.println("1. Catalog a New Book");
                     System.out.println("2. Find a Book by ISBN");
                     System.out.println("3. View Entire Library Inventory List");
-                    System.out.println("4. Update Book Stock Quantities"); // <-- NEW
+                    System.out.println("4. Update Book Stock Quantities");
                     System.out.println("5. Edit Book Information");
                     System.out.println("6. Remove Book from System");
                     System.out.println("7. Back to Main Screen");
                     System.out.print("Select an option (1-7): ");
 
                     try {
-                        int choice = Integer.parseInt(inputScanner.nextLine().trim());
-                        switch (choice) {
+                        int optionChoice = Integer.parseInt(inputScanner.nextLine().trim());
+                        switch (optionChoice) {
                             case 1:
                                 System.out.println("\n--- CATALOG NEW BOOK ---");
                                 int newIsbn = -1;
@@ -78,7 +79,6 @@ public class Main {
                                 System.out.print("Enter Author Name: ");
                                 String newAuthor = inputScanner.nextLine().trim();
 
-                                // Clean void call! SmartLibrary handles the success/warning print internally now.
                                 library.addBook(newIsbn, newTitle, newAuthor);
                                 break;
                                 
@@ -90,9 +90,11 @@ public class Main {
                                     System.out.println("[ERROR] ISBN must contain numbers only.");
                                 }
                                 break;
+
                             case 3:
                                 library.displayEntireCatalogue();
                                 break;
+
                             case 4:
                                 System.out.println("\n--- UPDATE BOOK STOCK QUANTITY ---");
                                 int stockIsbn = -1;
@@ -156,6 +158,7 @@ public class Main {
                                 insideLibrarian = false;
                                 System.out.println("\nLogging out of librarian portal...");
                                 break;
+
                             default:
                                 System.out.println("[ERROR] Out of bounds! Please pick an option from 1 to 7.");
                         }
@@ -168,7 +171,7 @@ public class Main {
             // ==========================================
             // STUDENT INTERFACE
             // ==========================================
-            else if (roleChoice == 2) {
+            else if (portalSelection == 2) {
                 boolean insideStudent = true;
                 while (insideStudent) {
                     System.out.println("\n--- STUDENT INTERFACE ---");
@@ -183,18 +186,17 @@ public class Main {
                     System.out.print("Select an option (1-8): ");
 
                     try {
-                        int choice = Integer.parseInt(inputScanner.nextLine().trim());
-                        switch (choice) {
+                        int studentChoice = Integer.parseInt(inputScanner.nextLine().trim());
+                        switch (studentChoice) {
                             case 1:
                                 int searchIsbn = -1;
-                                // This loop keeps running until a valid number above 0 is entered
                                 while (searchIsbn == -1) {
                                     System.out.print("Enter Book ISBN (Numbers Only): ");
                                     try {
                                         searchIsbn = Integer.parseInt(inputScanner.nextLine().trim());
                                         if (searchIsbn <= 0) {
                                             System.out.println("[ERROR] ISBN must be a positive number greater than zero.");
-                                            searchIsbn = -1; // Reset to keep looping
+                                            searchIsbn = -1;
                                         }
                                     } catch (NumberFormatException e) {
                                         System.out.println("[ERROR] Invalid input! Please enter numbers only.");
@@ -202,14 +204,17 @@ public class Main {
                                 }
                                 library.searchBookByISBN(searchIsbn);
                                 break;
+
                             case 2:
                                 System.out.print("\nEnter Title keyword to search: ");
                                 library.searchBookByTitle(inputScanner.nextLine().trim());
                                 break;
+
                             case 3:
                                 System.out.print("\nEnter Author Name to search: ");
                                 library.searchBookByAuthorName(inputScanner.nextLine().trim());
                                 break;
+
                             case 4:
                                 System.out.print("\nEnter ISBN of the book you want to borrow: ");
                                 try {
@@ -218,6 +223,7 @@ public class Main {
                                     System.out.println("[ERROR] Invalid selection. ISBN must be numeric digits only.");
                                 }
                                 break;
+
                             case 5:
                                 System.out.print("\nEnter ISBN of the book you are returning: ");
                                 try {
@@ -226,16 +232,45 @@ public class Main {
                                     System.out.println("[ERROR] Invalid selection. ISBN must be numeric.");
                                 }
                                 break;
+
                             case 6:
                                 library.viewLatestHistory();
                                 break;
+
                             case 7:
-                                library.checkAndPayFines();
+                                System.out.println("\n--- MY ACCOUNT BALANCE ---");
+                                // Display account details summary list
+                                library.checkAndPayFines(false); 
+                                
+                                int payDecision = -1;
+                                while (payDecision == -1) {
+                                    System.out.println("\nWould you like to pay off this balance right now?");
+                                    System.out.println("1. Yes, pay outstanding balance");
+                                    System.out.println("0. No, keep balance outstanding");
+                                    System.out.print("Please enter your choice (1 or 0): ");
+                                    
+                                    try {
+                                        payDecision = Integer.parseInt(inputScanner.nextLine().trim());
+                                        
+                                        if (payDecision == 1) {
+                                            library.checkAndPayFines(true);
+                                        } else if (payDecision == 0) {
+                                            System.out.println("\nReturning to student menu without processing payment.");
+                                        } else {
+                                            System.out.println("[ERROR] Out of bounds! Please type exactly 1 or 0.");
+                                            payDecision = -1;
+                                        }
+                                    } catch (NumberFormatException e) {
+                                        System.out.println("[ERROR] Invalid input! Please enter a numeric 1 or 0 only.");
+                                    }
+                                }
                                 break;
+
                             case 8:
                                 insideStudent = false;
                                 System.out.println("\nLogging out of student portal...");
                                 break;
+
                             default:
                                 System.out.println("\n[ERROR] Out of bounds! Please pick an option from 1 to 8.");
                         }

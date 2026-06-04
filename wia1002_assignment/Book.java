@@ -4,7 +4,9 @@ public class Book {
     private int isbn;
     private String title;
     private String authorName;
-    private int availableCopies; // Enhanced inventory tracking
+    private int availableCopies;
+    private int daysBorrowed;
+    private double fineAmount; // Enhanced inventory tracking
 
     // Binary Search Tree children pointers
     public Book left;
@@ -35,9 +37,25 @@ public class Book {
     public int getAvailableCopies() { 
         return availableCopies; 
     }
-    
+
+    public int getDaysBorrowed() { 
+        return daysBorrowed; 
+    }
+
+    public double getFineAmount() { 
+        return fineAmount; 
+    }
+
     public void setAvailableCopies(int copies) { 
         this.availableCopies = copies; 
+    }
+
+    public void setDaysBorrowed(int days) { 
+        this.daysBorrowed = days; 
+    }
+
+    public void setFineAmount(double fine) { 
+        this.fineAmount = fine; 
     }
 
     public void setTitle(String title) { 
@@ -50,7 +68,16 @@ public class Book {
 
     @Override
     public String toString() {
-        return String.format("ISBN: %-6d | Title: %-25s | Author: %-20s | Available Copies: %d", 
-                isbn, title, authorName, availableCopies);
+        return String.format("ISBN: %-6d | Title: %-25s | Author: %-20s | Available Copies: %d", isbn, title, authorName, availableCopies);
+    }
+
+    public String toHistoryString() {
+        String baseMessage = String.format("ISBN: %-6d | Title: %-25s | Author: %-20s | Days Borrowed: %d day(s)", 
+                isbn, title, authorName, daysBorrowed);
+        if (fineAmount > 0) {
+            return baseMessage + String.format(" -> [OVERDUE - Fine: $%.2f]", fineAmount);
+        } else {
+            return baseMessage + " -> [Within Grace Period]";
+        }
     }
 }
