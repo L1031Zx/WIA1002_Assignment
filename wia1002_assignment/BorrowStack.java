@@ -1,64 +1,53 @@
 package wia1002_assignment;
 
+import java.util.Stack;
+
 public class BorrowStack {
-    private Node top;
-    private int size;
+    private Stack<Book> historyStack;
 
-    private static class Node {
-        private final Book book;
-        private final Node next;
-
-        private Node(Book book, Node next) {
-            this.book = book;
-            this.next = next;
-        }
+    public BorrowStack() {
+        this.historyStack = new Stack<>();
     }
 
-    /**
-     * Pushes a borrowed book onto the top of the history stack.
-     */
+    // Adds a newly borrowed book to the user's active checkout list
     public void push(Book book) {
-        if (book == null) {
-            System.out.println("Cannot add an empty book to borrowing history.");
+        historyStack.push(book);
+    }
+
+    public int getCount() {
+        return historyStack.size();
+    }
+
+    public boolean containsBook(int isbn) {
+        for (Book b : historyStack) {
+            if (b.getIsbn() == isbn) return true;
+        }
+        return false;
+    }
+
+    public void removeBookFromHistory(int isbn) {
+        for (int i = historyStack.size() - 1; i >= 0; i--) {
+            if (historyStack.get(i).getIsbn() == isbn) {
+                historyStack.remove(i);
+                break;
+            }
+        }
+    }
+
+    // Displays the user's active borrowed books, showing the newest activity first
+    public void printHistory() {
+        if (historyStack.isEmpty()) {
+            System.out.println("\n[!] You have no active borrowed books.");
             return;
         }
-
-        top = new Node(book, top);
-        size++;
-    }
-
-    /**
-     * Returns true when there are no borrowed books in the history.
-     */
-    public boolean isEmpty() {
-        return top == null;
-    }
-
-    /**
-     * Returns the number of books currently stored in the history.
-     */
-    public int size() {
-        return size;
-    }
-
-    /**
-     * Displays the history in LIFO order (Most Recent First).
-     */
-    public void show() {
-        if (isEmpty()) {
-            System.out.println("Borrowing history is currently empty.");
-            return;
+        System.out.println("\n=======================================================================");
+        System.out.println("               YOUR BORROWED BOOKS (Most Recent First)                 ");
+        System.out.println("=======================================================================");
+        int count = 1;
+        for (int i = historyStack.size() - 1; i >= 0; i--) {
+            System.out.println(" " + count + ". " + historyStack.get(i));
+            count++;
         }
-
-        System.out.println("\n--- Borrowing History (Most Recent First) ---");
-
-        Node current = top;
-        while (current != null) {
-            Book b = current.book;
-            System.out.println("[ISBN: " + b.isbn + "] " + b.title + " by " + b.authorName);
-            current = current.next;
-        }
-
-        System.out.println("---------------------------------------------");
+        System.out.println("=======================================================================");
     }
 }
