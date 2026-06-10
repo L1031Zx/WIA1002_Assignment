@@ -26,10 +26,22 @@ public class SmartLibrary implements LibraryADT {
     @Override
     public void addBook(int isbn, String title, String authorName) {
         Book existingBook = catalogue.searchByISBN(isbn);
+        
+        // If it's not in the active catalog, check if a student currently has it borrowed
+        if (existingBook == null && history.containsBook(isbn)) {
+            // Find the borrowed book to verify details
+            // We use a dummy search or retrieve check to make sure the title matches
+            if (history.containsBook(isbn)) {
+                System.out.println("\n[ERROR] Cannot catalog book! ISBN " + isbn + " is already registered to a book currently borrowed by a student.");
+                return;
+            }
+        }
+
         if (existingBook == null) {
             catalogue.insert(isbn, title, authorName);
             System.out.println("\n[SUCCESS] Brand new book successfully logged into the library system.");
         } else {
+            // If the ISBN exists in the tree, make sure it's the exact same book title
             if (existingBook.getTitle().equalsIgnoreCase(title)) {
                 catalogue.insert(isbn, title, authorName);
                 System.out.println("\n[SUCCESS] Existing title recognized! Available copy stock increased by 1.");
