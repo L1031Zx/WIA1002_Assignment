@@ -64,4 +64,14 @@ public class BorrowStack {
         }
         System.out.println("==============================================================================================================================");
     }
+
+    // Removes and returns the actual borrowed Book instance from the stack
+    public Book popBookByIsbn(int isbn) {
+        for (int i = historyStack.size() - 1; i >= 0; i--) {
+            if (historyStack.get(i).getIsbn() == isbn) {
+                return historyStack.remove(i); // Removes from stack and returns the object
+            }
+        }
+        return null; // Not found
+    }
 }

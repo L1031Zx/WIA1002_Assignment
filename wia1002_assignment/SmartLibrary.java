@@ -118,18 +118,19 @@ public class SmartLibrary implements LibraryADT {
 
         Book bookToBorrow = catalogue.searchByISBN(isbn);
         if (bookToBorrow != null && bookToBorrow.getAvailableCopies() > 0) {
+            // Create a clean record for checkout; time duration is calculated on return
             Book borrowedBook = new Book(bookToBorrow.getIsbn(), bookToBorrow.getTitle(), bookToBorrow.getAuthorName());
             
-            // Simulates checkout duration from 0 to 9 days
+            //Simulate elapsed days immediately so Option 6 shows realistic data
             int borrowDuration = randomGenerator.nextInt(10); 
             borrowedBook.setDaysBorrowed(borrowDuration);
             
-            // Appends fine immediately to card if overdue
+            //Pre-calculate the fine on the book card if it's already past 5 days
             if (borrowDuration > 5) {
                 double copyFine = (borrowDuration - 5) * 0.50;
                 borrowedBook.setFineAmount(copyFine); 
             }
-            
+
             history.push(borrowedBook);
             catalogue.removeCopy(isbn);
             System.out.println("\n[SUCCESS] \"" + borrowedBook.getTitle() + "\" has been checked out!");
@@ -140,26 +141,21 @@ public class SmartLibrary implements LibraryADT {
 
     @Override
     public void returnBook(int isbn) {
-        if (history.containsBook(isbn)) {
-            int totalDaysHeld = history.getDaysBorrowedForBook(isbn); 
+        //Extract the actual book directly from history to preserve its true Title/Author
+        Book borrowedBook = history.popBookByIsbn(isbn);
+        
+        if (borrowedBook != null) {
+            //Read the existing snapshot data from the book card
+            int totalDaysHeld = borrowedBook.getDaysBorrowed();
+            String originalTitle = borrowedBook.getTitle();
+            String originalAuthor = borrowedBook.getAuthorName();
             
-            String originalTitle = "Borrowed Asset";
-            String originalAuthor = "Unknown Author";
-            Book targetBook = catalogue.searchByISBN(isbn); 
-            if (targetBook != null) {
-                originalTitle = targetBook.getTitle();
-                originalAuthor = targetBook.getAuthorName();
-            }
-            
-            // If late, creates a record and saves it into the unpaid fine records stack
+            //Process overdue checks and late billing records
             if (totalDaysHeld > 5) {
-                double addedFine = (totalDaysHeld - 5) * 0.50; 
+                double addedFine = borrowedBook.getFineAmount(); 
                 fineBalance += addedFine;
-                
-                Book chargedReceipt = new Book(isbn, originalTitle, originalAuthor);
-                chargedReceipt.setDaysBorrowed(totalDaysHeld);
-                chargedReceipt.setFineAmount(addedFine); 
-                unpaidFineRecords.push(chargedReceipt); // Saved here until paid
+                 
+                unpaidFineRecords.push(borrowedBook); // Saved safely here until student pays
                 
                 System.out.printf("\n[NOTICE] Processing Overdue Return: Held for %d days.\n", totalDaysHeld);
                 System.out.printf("A late fee of $%.2f has been added to your account billing statement.\n", addedFine);
@@ -167,7 +163,7 @@ public class SmartLibrary implements LibraryADT {
                 System.out.printf("\n[INFO] Book returned on time within grace period (Total days held: %d).\n", totalDaysHeld);
             }
             
-            history.removeBookFromHistory(isbn);
+            //Reinsert the exact genuine details back into the catalog tree layout
             catalogue.insert(isbn, originalTitle, originalAuthor);
             System.out.println("[SUCCESS] Return process finalized. Inventory restocked.");
         } else {

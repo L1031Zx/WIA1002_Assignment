@@ -82,11 +82,19 @@ public class BookBST {
             if (currentNode.getLeft() == null) return currentNode.getRight();
             if (currentNode.getRight() == null) return currentNode.getLeft();
 
-            // Case 3: Node has 2 child branches. Replace with smallest node from right side
-            currentNode = findMinValue(currentNode.getRight());
+            // Case 3: Node has 2 child branches. 
+            // Find the smallest node from right side (In-order Successor)
+            Book successor = findMinValue(currentNode.getRight());
             
-            // Delete the duplicate replacement node from its old location
-            currentNode.setRight(deleteNodeRecursive(currentNode.getRight(), currentNode.getIsbn()));
+            // Delete the successor from its old deep location inside the right branch
+            Book newRightSubtree = deleteNodeRecursive(currentNode.getRight(), successor.getIsbn());
+            
+            // Rewire successor pointers to take over the currentNode's structural position
+            successor.setRight(newRightSubtree);
+            successor.setLeft(currentNode.getLeft());
+            
+            // Return successor to update the parent's pointer references seamlessly
+            return successor;
         }
         return currentNode;
     }
