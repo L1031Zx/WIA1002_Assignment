@@ -9,8 +9,8 @@ public class Book {
     private double fineAmount; // Enhanced inventory tracking
 
     // Binary Search Tree children pointers
-    public Book left;
-    public Book right;
+    private Book left;
+    private Book right;
 
     public Book(int isbn, String title, String authorName) {
         this.isbn = isbn;
@@ -66,6 +66,22 @@ public class Book {
         this.authorName = authorName; 
     }
 
+    public Book getLeft() {
+        return left;
+    }
+
+    public void setLeft(Book left) {
+        this.left = left;
+    }
+
+    public Book getRight() {
+        return right;
+    }
+
+    public void setRight(Book right) {
+        this.right = right;
+    }
+    
     @Override
     public String toString() {
         return String.format("ISBN: %-6d | Title: %-25s | Author: %-20s | Available Copies: %d", isbn, title, authorName, availableCopies);

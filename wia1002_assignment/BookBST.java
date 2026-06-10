@@ -22,9 +22,9 @@ public class BookBST {
 
         // Navigate left for smaller ISBN, right for larger ISBN
         if (isbn < currentNode.getIsbn()) {
-            currentNode.left = insertRecursive(currentNode.left, isbn, title, authorName);
+            currentNode.setLeft(insertRecursive(currentNode.getLeft(), isbn, title, authorName));
         } else if (isbn > currentNode.getIsbn()) {
-            currentNode.right = insertRecursive(currentNode.right, isbn, title, authorName);
+            currentNode.setRight(insertRecursive(currentNode.getRight(), isbn, title, authorName));
         } else {
             // Same ISBN and same title: increase available stock
             if (currentNode.getTitle().equalsIgnoreCase(title)) {
@@ -45,9 +45,9 @@ public class BookBST {
             return currentNode;
         }
         if (isbn < currentNode.getIsbn()) {
-            return searchIsbnRecursive(currentNode.left, isbn);
+            return searchIsbnRecursive(currentNode.getLeft(), isbn);
         }
-        return searchIsbnRecursive(currentNode.right, isbn);
+        return searchIsbnRecursive(currentNode.getRight(), isbn);
     }
 
     // Lowers stock count by 1; erases node if stock hits 0
@@ -72,21 +72,21 @@ public class BookBST {
 
         // Navigate down branches to find the book
         if (isbn < currentNode.getIsbn()) {
-            currentNode.left = deleteNodeRecursive(currentNode.left, isbn);
+            currentNode.setLeft(deleteNodeRecursive(currentNode.getLeft(), isbn));
         } else if (isbn > currentNode.getIsbn()) {
-            currentNode.right = deleteNodeRecursive(currentNode.right, isbn);
+            currentNode.setRight(deleteNodeRecursive(currentNode.getRight(), isbn));
         } else {
             // Target found! Handle branch rewiring:
             
             // Case 1 & 2: Node has 0 or 1 child branch
-            if (currentNode.left == null) return currentNode.right;
-            if (currentNode.right == null) return currentNode.left;
+            if (currentNode.getLeft() == null) return currentNode.getRight();
+            if (currentNode.getRight() == null) return currentNode.getLeft();
 
             // Case 3: Node has 2 child branches. Replace with smallest node from right side
-            currentNode = findMinValue(currentNode.right);
+            currentNode = findMinValue(currentNode.getRight());
             
             // Delete the duplicate replacement node from its old location
-            currentNode.right = deleteNodeRecursive(currentNode.right, currentNode.getIsbn());
+            currentNode.setRight(deleteNodeRecursive(currentNode.getRight(), currentNode.getIsbn()));
         }
         return currentNode;
     }
@@ -94,9 +94,9 @@ public class BookBST {
     // Finds the lowest numeric value in a given sub-tree layout
     private Book findMinValue(Book subTreeRoot) {
         Book lowestValuedNode = subTreeRoot;
-        while (subTreeRoot.left != null) {
-            lowestValuedNode = subTreeRoot.left;
-            subTreeRoot = subTreeRoot.left;
+        while (subTreeRoot.getLeft() != null) {
+            lowestValuedNode = subTreeRoot.getLeft();
+            subTreeRoot = subTreeRoot.getLeft();
         }
         return lowestValuedNode;
     }
@@ -113,9 +113,9 @@ public class BookBST {
     // In-order traversal: Prints Left branch, then active Root, then Right branch
     private void printInOrderRecursive(Book currentNode) {
         if (currentNode != null) {
-            printInOrderRecursive(currentNode.left);
+            printInOrderRecursive(currentNode.getLeft());
             System.out.println(" -> " + currentNode);
-            printInOrderRecursive(currentNode.right);
+            printInOrderRecursive(currentNode.getRight());
         }
     }
 
@@ -128,12 +128,12 @@ public class BookBST {
 
     private void searchTitleRecursive(Book currentNode, String targetKeyword) {
         if (currentNode != null) {
-            searchTitleRecursive(currentNode.left, targetKeyword);
+            searchTitleRecursive(currentNode.getLeft(), targetKeyword);
             if (currentNode.getTitle().toLowerCase().contains(targetKeyword)) {
                 System.out.println(" -> " + currentNode);
                 matchFound = true;
             }
-            searchTitleRecursive(currentNode.right, targetKeyword);
+            searchTitleRecursive(currentNode.getRight(), targetKeyword);
         }
     }
 
@@ -146,12 +146,12 @@ public class BookBST {
 
     private void searchAuthorRecursive(Book currentNode, String targetKeyword) {
         if (currentNode != null) {
-            searchAuthorRecursive(currentNode.left, targetKeyword);
+            searchAuthorRecursive(currentNode.getLeft(), targetKeyword);
             if (currentNode.getAuthorName().toLowerCase().contains(targetKeyword)) {
                 System.out.println(" -> " + currentNode);
                 matchFound = true;
             }
-            searchAuthorRecursive(currentNode.right, targetKeyword);
+            searchAuthorRecursive(currentNode.getRight(), targetKeyword);
         }
     }
 }
