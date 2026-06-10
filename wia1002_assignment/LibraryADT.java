@@ -1,6 +1,6 @@
 package wia1002_assignment;
 
-public interface LibraryADT {
+interface LibraryADT {
     //Method headers for the LibraryADT interface
     void addBook(int isbn,String title,String authorName);
     void removeBook(int isbn);
