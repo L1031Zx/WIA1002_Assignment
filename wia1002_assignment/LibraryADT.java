@@ -13,5 +13,5 @@ public interface LibraryADT {
     void updateBookStock(int isbn, int newCopyCount);
     void editBookDetails(int isbn, String newTitle, String newAuthor);
     void preloadBook(int isbn, String title, String authorName);
-    void checkAndPayFines(boolean payNow);
+    boolean checkAndPayFines(boolean payNow);
 }

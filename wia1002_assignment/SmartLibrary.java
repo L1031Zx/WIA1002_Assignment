@@ -164,14 +164,14 @@ public class SmartLibrary implements LibraryADT {
     }
 
     @Override
-    public void checkAndPayFines(boolean payNow) {
+    public boolean checkAndPayFines(boolean payNow) {
         // Quietly processes payment if decision flag is set to true
         if (payNow) {
             System.out.println("\nProcessing payment transaction... Please wait...");
             fineBalance = 0.0;
             unpaidFineRecords.clear(); // Empties the list because everything is now paid
             System.out.println("[SUCCESS] Payment accepted! Your outstanding balance is now clear.");
-            return; 
+            return false; 
         }
 
         // Prints fine breakdown if decision flag is set to false
@@ -182,7 +182,7 @@ public class SmartLibrary implements LibraryADT {
         if (unpaidFineRecords.isEmpty() && fineBalance == 0.0) {
             System.out.println(" Your account is in excellent standing. No items have accrued late fees.");
             System.out.println("=======================================================================");
-            return;
+            return false;
         }
 
         System.out.println("Itemized Breakdown of Overdue Charges:");
@@ -197,6 +197,7 @@ public class SmartLibrary implements LibraryADT {
         System.out.printf(" TOTAL OUTSTANDING BALANCE DUE: $%.2f\n", fineBalance);
         System.out.println("=======================================================================");
         System.out.println("[INFO] Payment deferred. This balance remains outstanding on your profile.");
+        return true;
     }
 
     @Override

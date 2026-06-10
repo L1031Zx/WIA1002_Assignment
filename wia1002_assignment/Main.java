@@ -240,28 +240,30 @@ public class Main {
                             case 7:
                                 System.out.println("\n--- MY ACCOUNT BALANCE ---");
                                 // Display account details summary list
-                                library.checkAndPayFines(false); 
+                                boolean hasFines = library.checkAndPayFines(false); 
                                 
-                                int payDecision = -1;
-                                while (payDecision == -1) {
-                                    System.out.println("\nWould you like to pay off this balance right now?");
-                                    System.out.println("1. Yes, pay outstanding balance");
-                                    System.out.println("0. No, keep balance outstanding");
-                                    System.out.print("Please enter your choice (1 or 0): ");
-                                    
-                                    try {
-                                        payDecision = Integer.parseInt(inputScanner.nextLine().trim());
+                                if (hasFines) {
+                                    int payDecision = -1;
+                                    while (payDecision == -1) {
+                                        System.out.println("\nWould you like to pay off this balance right now?");
+                                        System.out.println("1. Yes, pay outstanding balance");
+                                        System.out.println("0. No, keep balance outstanding");
+                                        System.out.print("Please enter your choice (1 or 0): ");
                                         
-                                        if (payDecision == 1) {
-                                            library.checkAndPayFines(true);
-                                        } else if (payDecision == 0) {
-                                            System.out.println("\nReturning to student menu without processing payment.");
-                                        } else {
-                                            System.out.println("[ERROR] Out of bounds! Please type exactly 1 or 0.");
-                                            payDecision = -1;
+                                        try {
+                                            payDecision = Integer.parseInt(inputScanner.nextLine().trim());
+                                            
+                                            if (payDecision == 1) {
+                                                library.checkAndPayFines(true);
+                                            } else if (payDecision == 0) {
+                                                System.out.println("\nReturning to student menu without processing payment.");
+                                            } else {
+                                                System.out.println("[ERROR] Out of bounds! Please type exactly 1 or 0.");
+                                                payDecision = -1;
+                                            }
+                                        } catch (NumberFormatException e) {
+                                            System.out.println("[ERROR] Invalid input! Please enter a numeric 1 or 0 only.");
                                         }
-                                    } catch (NumberFormatException e) {
-                                        System.out.println("[ERROR] Invalid input! Please enter a numeric 1 or 0 only.");
                                     }
                                 }
                                 break;
